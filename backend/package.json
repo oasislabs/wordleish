@@ -1,0 +1,70 @@
+{
+  "private": true,
+  "name": "@oasislabs/wordleish-backend",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "./lib/cjs/src/index.js",
+  "module": "./lib/esm/src/index.js",
+  "types": "./lib/cjs/src/index.d.ts",
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=7"
+  },
+  "files": [
+    "contracts",
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "lint:prettier": "prettier --check --plugin-search-dir=. --cache '*.json' 'tsconfig/*.json' '{scripts,test}/**/*.ts' 'scripts/**/*.ts' 'contracts/**/*.sol'",
+    "lint:solhint": "solhint 'contracts/**/*.sol'",
+    "lint": "npm-run-all lint:**",
+    "format:prettier": "prettier --write --plugin-search-dir=. --cache '*.json' 'tsconfig/*.json' '{scripts,test}/**/*.ts' 'contracts/**/*.sol'",
+    "format:solhint": "solhint --fix 'contracts/**/*.sol'",
+    "format": "npm-run-all format:**",
+    "build:compile": "hardhat compile",
+    "build:cjs": "tsc -p tsconfig/cjs.json",
+    "build:esm": "tsc -p tsconfig/esm.json",
+    "build": "npm-run-all build:compile --parallel build:cjs build:esm",
+    "test": "hardhat test",
+    "prepublishOnly": "pnpm build"
+  },
+  "exports": {
+    "default": "./lib/esm/src/index.js",
+    "node": {
+      "import": "./lib/esm/src/index.js",
+      "require": "./lib/cjs/src/index.js"
+    }
+  },
+  "dependencies": {
+    "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@openzeppelin/contracts": "^4.7.3",
+    "ethers": "^5.7.2"
+  },
+  "devDependencies": {
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/bytes": "^5.7.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@oasisprotocol/sapphire-hardhat": "^1.0.2",
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.3",
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.11.8",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.4",
+    "hardhat": "^2.12.1",
+    "hardhat-watcher": "^2.5.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "1.0.0-beta.24",
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.8.2",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.1.0",
+    "typescript": "^4.8.4"
+  }
+}
