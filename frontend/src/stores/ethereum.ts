@@ -2,7 +2,7 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import * as sapphire from '@oasisprotocol/sapphire-paratime';
 import { ethers } from 'ethers';
 import { defineStore } from 'pinia';
-import { ref, shallowRef } from 'vue';
+import { markRaw, ref, shallowRef } from 'vue';
 
 export enum Network {
   Unknown = 0,
@@ -49,22 +49,21 @@ export const useEthereumStore = defineStore('ethereum', () => {
 
   async function connect() {
     if (signer.value) return;
-    console.log('connecting');
     const eth = await detectEthereumProvider();
     if (eth === null) throw new Error('no provider detected'); // TODO: catch error
-    console.log('getting signer');
     const s = new ethers.providers.Web3Provider(eth).getSigner();
+    await s.provider.send('eth_requestAccounts', []);
 
     const setSigner = () => {
       if (!network.value) return;
-      provider.value = s.provider;
-      signer.value = sapphire.NETWORKS[network.value as number]
-        ? sapphire.wrap(s)
-        : s;
+      const isSapphire = sapphire.NETWORKS[network.value as number];
+      signer.value = isSapphire ? sapphire.wrap(s) : s;
+      provider.value = isSapphire
+        ? markRaw(sapphire.wrap(s.provider))
+        : s.provider;
     };
 
     await Promise.all([
-      s.provider.send('eth_requestAccounts', []),
       s.getAddress().then((addr) => (address.value = addr)),
       s.getChainId().then((id) => (network.value = networkFromChainId(id))),
     ]);
@@ -84,7 +83,6 @@ export const useEthereumStore = defineStore('ethereum', () => {
     });
     eth.on('connect', () => (status.value = ConnectionStatus.Connected));
     eth.on('disconnect', () => (status.value = ConnectionStatus.Disconnected));
-    console.log('connected');
   }
 
   async function switchNetwork(network: Network) {

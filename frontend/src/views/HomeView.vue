@@ -36,6 +36,7 @@ async function joinGame(e: Event): Promise<void> {
     Number.parseInt(gameId.value!, 10) > numGames.value
   ) {
     showingNoGame.value = true;
+    return;
   }
   router.push({ name: 'game', params: { gameId: gameId.value } });
 }
@@ -52,7 +53,6 @@ async function createGame(e: Event): Promise<void> {
   e.preventDefault();
   creatingGame.value = true;
   try {
-    console.log('connecting');
     await eth.connect();
     if (!(await checkWord(newGameWord.value))) {
       showingNotWord.value = true;
@@ -93,7 +93,11 @@ async function createGame(e: Event): Promise<void> {
           width="1em"
           height="1em" /></ContentLoader
       >.
-      <Dropdown :triggers="[]" :shown="showingNoGame">
+      <Dropdown
+        :triggers="[]"
+        :shown="showingNoGame"
+        @apply-hide="showingNoGame = false"
+      >
         <input
           title="numeric game id"
           required

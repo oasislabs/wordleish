@@ -36,6 +36,7 @@ async function makeGuess(e: Event): Promise<void> {
     guesses.value.unshift({ letters: guess.value, matches });
     guessing.value = false;
     if (matches.every((m) => m == LetterMatch.Correct)) {
+      won.value = true;
       await eth.connect();
       const tx = await wordleish.value.write!.guess(
         props.gameId,
@@ -44,14 +45,14 @@ async function makeGuess(e: Event): Promise<void> {
       );
       console.log('submitted winning word in', tx.hash);
       const receipt = await tx.wait();
-      if (receipt.status !== 1) throw new Error('Guess transaction failed.')
-      console.log(receipt);
-      won.value = true;
+      if (receipt.status !== 1) throw new Error('Guess transaction failed.');
     }
     guess.value = '';
   } catch (e: any) {
-    guessProblem.value = e.message;
+    console.error(e.message);
+    guessProblem.value = `Error: ${e.reason ?? e.message}`;
     guessProblemShown.value = true;
+    won.value = false;
   } finally {
     guessing.value = false;
   }
@@ -66,6 +67,7 @@ async function makeGuess(e: Event): Promise<void> {
         :triggers="[]"
         :shown="guessProblemShown"
         placement="top"
+        no-auto-focus
         @apply-hide="guessProblemShown = false"
       >
         <input

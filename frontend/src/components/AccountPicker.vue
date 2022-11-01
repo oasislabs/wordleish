@@ -66,7 +66,7 @@ async function connectWallet() {
 }
 
 .empty-icon {
-  --icon-size: v-bind(iconsize + 'px');
+  --icon-size: 30px;
   @apply border border-gray-900;
 
   width: var(--icon-size);
