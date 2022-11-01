@@ -50,7 +50,7 @@ async function makeGuess(e: Event): Promise<void> {
     guess.value = '';
   } catch (e: any) {
     console.error(e.message);
-    guessProblem.value = `Error: ${e.reason ?? e.message}`;
+    guessProblem.value = e.reason ?? e.message;
     guessProblemShown.value = true;
     won.value = false;
   } finally {
