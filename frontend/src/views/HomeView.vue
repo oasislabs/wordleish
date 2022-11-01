@@ -115,7 +115,8 @@ async function createGame(e: Event): Promise<void> {
         <input
           title="five-letter English word"
           required
-          minlength="1"
+          minlength="5"
+          maxlength="5"
           size="5"
           placeholder="ideal"
           pattern="^\w{5,5}$"
@@ -139,7 +140,7 @@ form {
 }
 
 input {
-  @apply block my-4 px-1 mx-auto text-3xl text-center border border-gray-400 rounded-md;
+  @apply block my-4 p-1 mx-auto text-3xl text-center border border-gray-400 rounded-md;
 }
 
 h2 {
