@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ethers } from 'ethers';
 import { Dropdown } from 'floating-vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ContentLoader } from 'vue-content-loader';
 
 import { LetterMatch, a2i, getMatches, useWordleish } from '../contracts';
@@ -9,6 +9,7 @@ import { checkBestEffort as checkWordBestEffort } from '../dictionary';
 import { useEthereumStore } from '../stores/ethereum';
 
 const props = defineProps<{ gameId: string }>();
+const gameId = computed(() => Number.parseInt(props.gameId, 10) - 1);
 
 const eth = useEthereumStore();
 const wordleish = useWordleish();
@@ -31,7 +32,7 @@ async function makeGuess(e: Event): Promise<void> {
 
     guessing.value = true;
     const mask = await wordleish.value.read.callStatic.guess(
-      props.gameId,
+      gameId.value,
       a2i(guess.value),
     );
     const matches = getMatches(mask);
@@ -41,7 +42,7 @@ async function makeGuess(e: Event): Promise<void> {
       won.value = true;
       await eth.connect();
       const tx = await wordleish.value.write!.guess(
-        props.gameId,
+        gameId.value,
         a2i(guess.value),
         { gasLimit: 300_000 },
       );
@@ -53,7 +54,6 @@ async function makeGuess(e: Event): Promise<void> {
     }
     guess.value = '';
   } catch (e: any) {
-    console.error(e.message);
     guessProblem.value = e.reason ?? e.message;
     guessProblemShown.value = true;
     won.value = false;
@@ -67,7 +67,7 @@ const solutions = ref<{ firstSolver: string; numSolves: number } | undefined>();
 async function fetchSolves(): Promise<void> {
   try {
     const { firstSolver, numSolves } =
-      await wordleish.value.read.callStatic.solvers(props.gameId);
+      await wordleish.value.read.callStatic.solvers(gameId.value);
     if (firstSolver === ethers.constants.AddressZero) {
       solutions.value = { firstSolver: '', numSolves: 0 };
     } else {
@@ -91,7 +91,7 @@ function truncAddr(addr: string): string {
 
 <template>
   <main style="max-width: 60ch" class="p-5 m-auto">
-    <h1 class="font-medium text-3xl">Puzzle #{{ gameId }}</h1>
+    <h1 class="font-medium text-3xl">Puzzle #{{ props.gameId }}</h1>
     <p class="text-gray-500 mb-10" style="height: 3em">
       <ContentLoader v-if="!solutions || submitting" width="30ch" height="3em">
         <rect x="0" y="0.1em" rx="3" ry="3" width="30ch" height="1.3em" />
@@ -126,6 +126,7 @@ function truncAddr(addr: string): string {
           :placeholder="won ? guesses[0].letters : 'guess'"
           v-model="guess"
           :disabled="won"
+          @input="guessProblemShown = false"
         />
         <template #popper>
           <p class="p-2">{{ guessProblem }}</p>

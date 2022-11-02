@@ -33,7 +33,7 @@ async function joinGame(e: Event): Promise<void> {
   e.preventDefault();
   if (
     typeof numGames.value === 'number' &&
-    Number.parseInt(gameId.value!, 10) >= numGames.value
+    Number.parseInt(gameId.value!, 10) > numGames.value
   ) {
     showingNoGame.value = true;
     return;
@@ -90,6 +90,7 @@ async function createGame(e: Event): Promise<void> {
       <Dropdown
         :triggers="[]"
         :shown="showingNoGame"
+        placement="top"
         @apply-hide="showingNoGame = false"
       >
         <input
@@ -109,7 +110,7 @@ async function createGame(e: Event): Promise<void> {
     </form>
     <form class="mt-16" @submit="createGame">
       <h2>Create a Puzzle</h2>
-      <Dropdown :triggers="[]" :shown="showingNotWord">
+      <Dropdown :triggers="[]" :shown="showingNotWord" placement="top">
         <input
           title="five-letter English word"
           required
