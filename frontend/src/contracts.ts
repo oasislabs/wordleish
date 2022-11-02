@@ -12,7 +12,7 @@ export function useWordleish(): ComputedRef<{
   write?: Wordleish;
 }> {
   const eth = useEthereumStore();
-  const addr = '0x14C82fc6d33ef2AC1122bEB346F2Ce66Bc5ACF5F';
+  const addr = '0x40b81e081b1aF09875a07376bdAD27507774e9a3';
   return computed(() => {
     const read = Wordleish__factory.connect(addr, eth.provider);
     const write = eth.signer
@@ -24,7 +24,7 @@ export function useWordleish(): ComputedRef<{
 
 export function a2i(word: string): BigNumber {
   const bytes = new Uint8Array(32);
-  new TextEncoder().encodeInto(word, bytes);
+  new TextEncoder().encodeInto(word.toLowerCase(), bytes);
   return BigNumber.from(bytes);
 }
 

@@ -33,7 +33,7 @@ async function joinGame(e: Event): Promise<void> {
   e.preventDefault();
   if (
     typeof numGames.value === 'number' &&
-    Number.parseInt(gameId.value!, 10) > numGames.value
+    Number.parseInt(gameId.value!, 10) >= numGames.value
   ) {
     showingNoGame.value = true;
     return;
@@ -79,20 +79,14 @@ async function createGame(e: Event): Promise<void> {
 </script>
 
 <template>
-  <main style="max-width: 60ch" class="py-5 m-auto w-2/3">
+  <main style="max-width: 60ch" class="py-5 m-auto w-4/5">
     <form class="mb-8" @submit="joinGame">
-      <h2>Play a Game</h2>
-      The number of games is currently
+      <h2>Solve a Puzzle</h2>
       <span v-if="numGames !== undefined">{{ numGames }}</span
       ><ContentLoader v-else class="inline" width="1em" height="1em"
-        ><rect
-          x="0"
-          y="0"
-          rx="3"
-          ry="3"
-          width="1em"
-          height="1em" /></ContentLoader
-      >.
+        ><rect x="0" y="0" rx="3" ry="3" width="1em" height="1em"
+      /></ContentLoader>
+      puzzles have been created so far.
       <Dropdown
         :triggers="[]"
         :shown="showingNoGame"
@@ -108,13 +102,13 @@ async function createGame(e: Event): Promise<void> {
           v-model="gameId"
         />
         <template #popper>
-          <p class="p-2">This game does not exist.</p>
+          <p class="p-2">This puzzle does not exist.</p>
         </template>
       </Dropdown>
-      <button class="bg-rose-500">Play</button>
+      <button class="bg-rose-500">Go</button>
     </form>
     <form class="mt-16" @submit="createGame">
-      <h2>Create a Game</h2>
+      <h2>Create a Puzzle</h2>
       <Dropdown :triggers="[]" :shown="showingNotWord">
         <input
           title="five-letter English word"
@@ -125,6 +119,7 @@ async function createGame(e: Event): Promise<void> {
           placeholder="ideal"
           pattern="^\w{5,5}$"
           v-model="newGameWord"
+          :disabled="creatingGame"
         />
         <template #popper>
           <p class="p-2">This word is not recognized.</p>

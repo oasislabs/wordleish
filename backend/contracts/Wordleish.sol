@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
+
 contract Wordleish {
     using Counters for Counters.Counter;
 
@@ -18,12 +19,18 @@ contract Wordleish {
         Correct
     }
 
+    struct Solvers {
+        address firstSolver;
+        uint256 numSolves;
+    }
+
     event GameStarted(GameId gameId);
     event GameSolved(GameId indexed gameId);
 
     Counters.Counter public nextGameId;
 
     mapping(GameId => Word) private games;
+    mapping(GameId => Solvers) public solvers;
 
     modifier validWord(Word _word) {
         for (uint256 i; i < WORD_LEN; ++i) {
@@ -57,6 +64,11 @@ contract Wordleish {
             matches = _setMask(matches, i, LetterMatch.Correct);
         }
         if (correct) {
+            Solvers storage solves = solvers[_gameId];
+            if (solves.firstSolver == address(0)) {
+                solves.firstSolver = msg.sender;
+            }
+            solves.numSolves += 1;
             emit GameSolved(_gameId);
             return matches;
         }

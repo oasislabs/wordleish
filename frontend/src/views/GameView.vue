@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ethers } from 'ethers';
 import { Dropdown } from 'floating-vue';
 import { ref } from 'vue';
 import { ContentLoader } from 'vue-content-loader';
@@ -18,6 +19,7 @@ const guessProblemShown = ref(false);
 const guessing = ref(false);
 const guesses = ref<Array<{ letters: string; matches: LetterMatch[] }>>([]);
 const won = ref(false);
+const submitting = ref(false);
 
 async function makeGuess(e: Event): Promise<void> {
   e.preventDefault();
@@ -43,9 +45,11 @@ async function makeGuess(e: Event): Promise<void> {
         a2i(guess.value),
         { gasLimit: 300_000 },
       );
+      submitting.value = true;
       console.log('submitted winning word in', tx.hash);
       const receipt = await tx.wait();
       if (receipt.status !== 1) throw new Error('Guess transaction failed.');
+      await fetchSolves();
     }
     guess.value = '';
   } catch (e: any) {
@@ -55,13 +59,51 @@ async function makeGuess(e: Event): Promise<void> {
     won.value = false;
   } finally {
     guessing.value = false;
+    submitting.value = false;
   }
+}
+
+const solutions = ref<{ firstSolver: string; numSolves: number } | undefined>();
+async function fetchSolves(): Promise<void> {
+  try {
+    const { firstSolver, numSolves } =
+      await wordleish.value.read.callStatic.solvers(props.gameId);
+    if (firstSolver === ethers.constants.AddressZero) {
+      solutions.value = { firstSolver: '', numSolves: 0 };
+    } else {
+      solutions.value = {
+        firstSolver:
+          firstSolver === eth.address ? 'You' : truncAddr(firstSolver),
+        numSolves: numSolves.toNumber(),
+      };
+    }
+  } catch (e: any) {
+    console.error('failed to fetch solvers', e);
+  }
+}
+fetchSolves();
+
+function truncAddr(addr: string): string {
+  addr = addr.replace('0x', '');
+  return `${addr.slice(0, 10)}…${addr.slice(-10)}`;
 }
 </script>
 
 <template>
   <main style="max-width: 60ch" class="p-5 m-auto">
-    <h1 class="font-medium text-3xl">#{{ gameId }}</h1>
+    <h1 class="font-medium text-3xl">Puzzle #{{ gameId }}</h1>
+    <p class="text-gray-500 mb-10" style="height: 3em">
+      <ContentLoader v-if="!solutions || submitting" width="30ch" height="3em">
+        <rect x="0" y="0.1em" rx="3" ry="3" width="30ch" height="1.3em" />
+        <rect x="0" y="1.6em" rx="3" ry="3" width="20ch" height="1.3em" />
+      </ContentLoader>
+      <template v-else-if="solutions && solutions.firstSolver">
+        🥇 <span class="font-mono text-sm">{{ solutions.firstSolver }}</span>
+        <br />
+        🥈 {{ solutions.numSolves - 1 }} others
+      </template>
+      <span v-else> This puzzle has not yet been solved. </span>
+    </p>
     <form @submit="makeGuess">
       <Dropdown
         :triggers="[]"
