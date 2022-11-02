@@ -98,9 +98,15 @@ function truncAddr(addr: string): string {
         <rect x="0" y="1.6em" rx="3" ry="3" width="20ch" height="1.3em" />
       </ContentLoader>
       <template v-else-if="solutions && solutions.firstSolver">
-        🥇 <span class="font-mono text-sm">{{ solutions.firstSolver }}</span>
+        <span aria-description="first solver">
+          🥇&nbsp;<span class="font-mono text-sm">{{
+            solutions.firstSolver
+          }}</span>
+        </span>
         <br />
-        🥈 {{ solutions.numSolves - 1 }} others
+        <span aria-description="number of times solved">
+          🥈&nbsp;{{ solutions.numSolves - 1 }} others
+        </span>
       </template>
       <span v-else> This puzzle has not yet been solved. </span>
     </p>
