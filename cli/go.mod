@@ -5,10 +5,8 @@ go 1.19
 require (
 	github.com/ethereum/go-ethereum v1.10.26
 	github.com/fatih/color v1.13.0
-	github.com/oasisprotocol/sapphire-paratime v0.2.1-testnet.0.20221203095836-668c45a2ae2e
+	github.com/oasisprotocol/sapphire-paratime/clients/go v0.9.0
 )
-
-replace github.com/oasisprotocol/sapphire-paratime => /Users/nhynes/Projects/sapphire-paratime
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
@@ -35,7 +33,6 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/go-hclog v1.3.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.5 // indirect
-	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -72,7 +69,6 @@ require (
 	github.com/tendermint/tendermint v0.34.21 // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
-	github.com/twystd/tweetnacl-go v0.0.0-20210413205227-681aa97ec383 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect

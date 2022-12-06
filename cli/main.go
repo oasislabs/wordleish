@@ -138,7 +138,7 @@ func makeGuess(c *bind.BoundContract, gameId *big.Int, word string) ([5]LetterMa
 }
 
 func packWord(word string) *big.Int {
-	chars := *(*[5]byte)([]byte(word))
+	chars := *(*[5]byte)([]byte(strings.ToLower(word)))
 	iword := uint64(0)
 	for i, v := range chars {
 		iword |= uint64(v) << ((7 - i) * 8)
