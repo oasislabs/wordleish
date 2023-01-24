@@ -5,14 +5,17 @@ import { computed } from 'vue';
 import type { Wordleish } from '@oasislabs/wordleish-backend';
 import { Wordleish__factory } from '@oasislabs/wordleish-backend';
 
-import { useEthereumStore } from './stores/ethereum';
+import { Network, useEthereumStore } from './stores/ethereum';
 
 export function useWordleish(): ComputedRef<{
   read: Wordleish;
   write?: Wordleish;
 }> {
   const eth = useEthereumStore();
-  const addr = '0x40b81e081b1aF09875a07376bdAD27507774e9a3';
+  let addr = '0xdE5DAB93f9008D4A2A746EB4e3903bF835D8c7D4';
+  if (eth.network === Network.SapphireTestnet) {
+    addr = '0x40b81e081b1aF09875a07376bdAD27507774e9a3';
+  }
   return computed(() => {
     const read = Wordleish__factory.connect(addr, eth.provider);
     const write = eth.signer

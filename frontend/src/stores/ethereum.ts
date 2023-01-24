@@ -38,12 +38,10 @@ export const useEthereumStore = defineStore('ethereum', () => {
   const signer = shallowRef<ethers.Signer | undefined>(undefined);
   const provider = shallowRef<ethers.providers.Provider>(
     sapphire.wrap(
-      new ethers.providers.JsonRpcProvider(
-        'https://testnet.sapphire.oasis.dev',
-      ),
+      new ethers.providers.JsonRpcProvider('https://sapphire.oasis.io'),
     ),
   );
-  const network = ref(Network.SapphireTestnet);
+  const network = ref(Network.SapphireMainnet);
   const address = ref<string | undefined>(undefined);
   const status = ref(ConnectionStatus.Unknown);
 
@@ -95,7 +93,8 @@ export const useEthereumStore = defineStore('ethereum', () => {
       });
     } catch (e: any) {
       // This error code indicates that the chain has not been added to MetaMask.
-      if ((e as any).code === 4902 && network == Network.SapphireTestnet) {
+      if ((e as any).code !== 4902) throw e;
+      if (network == Network.SapphireTestnet) {
         try {
           await eth.request({
             method: 'wallet_addEthereumChain',
@@ -104,6 +103,21 @@ export const useEthereumStore = defineStore('ethereum', () => {
                 chainId: '0x5aff',
                 chainName: 'Sapphire Testnet',
                 rpcUrls: ['https://testnet.sapphire.oasis.dev'],
+              },
+            ],
+          });
+        } catch (e: any) {
+          throw new Error(e);
+        }
+      } else if (network === Network.SapphireMainnet) {
+        try {
+          await eth.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x5afe',
+                chainName: 'Sapphire Mainnet',
+                rpcUrls: ['https://sapphire.oasis.io'],
               },
             ],
           });

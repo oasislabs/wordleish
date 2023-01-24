@@ -69,7 +69,7 @@ async function createGame(e: Event): Promise<void> {
       startedLog.data,
       startedLog.topics,
     );
-    router.push({ name: 'game', params: { gameId: gameId.toNumber() } });
+    router.push({ name: 'game', params: { gameId: gameId.toNumber() + 1 } });
   } catch (e: any) {
     if (e.message !== 'not word') console.error(e.message);
   } finally {
