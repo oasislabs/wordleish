@@ -52,32 +52,32 @@ export const useEthereumStore = defineStore('ethereum', () => {
     const s = new ethers.providers.Web3Provider(eth).getSigner();
     await s.provider.send('eth_requestAccounts', []);
 
-    const setSigner = () => {
-      if (!network.value) return;
-      const isSapphire = sapphire.NETWORKS[network.value as number];
+    const setSigner = (addr: string | undefined, net: Network) => {
+      if (!net) return;
+      const isSapphire = sapphire.NETWORKS[net as number];
       signer.value = isSapphire ? sapphire.wrap(s) : s;
       provider.value = isSapphire
         ? markRaw(sapphire.wrap(s.provider))
         : s.provider;
+      network.value = net;
+      address.value = addr;
     };
 
-    await Promise.all([
-      s.getAddress().then((addr) => (address.value = addr)),
-      s.getChainId().then((id) => (network.value = networkFromChainId(id))),
+    const [addr, net] = await Promise.all([
+      s.getAddress(),
+      s.getChainId().then(networkFromChainId),
     ]);
-    setSigner();
+    setSigner(addr, net);
 
     if (!eth.isMetaMask) {
       status.value = ConnectionStatus.Connected;
       return;
     }
     eth.on('accountsChanged', (accounts) => {
-      address.value = accounts[0];
-      if (!accounts[0]) signer.value = undefined;
+      setSigner(accounts[0], network.value);
     });
     eth.on('chainChanged', (chainId) => {
-      network.value = networkFromChainId(chainId);
-      setSigner();
+      setSigner(address.value, networkFromChainId(chainId));
     });
     eth.on('connect', () => (status.value = ConnectionStatus.Connected));
     eth.on('disconnect', () => (status.value = ConnectionStatus.Disconnected));

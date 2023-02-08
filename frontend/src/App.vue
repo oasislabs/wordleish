@@ -8,7 +8,10 @@ import { Network, useEthereumStore } from './stores/ethereum';
 const eth = useEthereumStore();
 
 watch(eth, async (eth) => {
-  if (eth.network !== Network.SapphireTestnet && eth.network !== Network.SapphireMainnet)
+  if (
+    eth.network !== Network.SapphireTestnet &&
+    eth.network !== Network.SapphireMainnet
+  )
     await eth.switchNetwork(Network.SapphireMainnet);
 });
 </script>

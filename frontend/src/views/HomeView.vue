@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { CirclesToRhombusesSpinner } from 'epic-spinners';
 import { Dropdown } from 'floating-vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { ContentLoader } from 'vue-content-loader';
 import { useRouter } from 'vue-router';
+
+import type { Wordleish } from '@oasislabs/wordleish-backend';
 
 import { a2i, useWordleish } from '../contracts';
 import { check as checkWord } from '../dictionary';
@@ -13,14 +15,19 @@ const router = useRouter();
 const eth = useEthereumStore();
 const wordleish = useWordleish();
 
-let numGames = ref<string | number | undefined>(undefined);
-wordleish.value.read.callStatic
-  .nextGameId()
-  .then((id) => (numGames.value = id.toNumber()))
-  .catch((e: any) => {
-    console.log(e);
-    numGames.value = 'unknown';
-  });
+let numGames = ref<number | undefined>(undefined);
+async function updateNumGames(wordleish: Wordleish) {
+  console.log('updating num games');
+  try {
+    const id = await wordleish.callStatic.nextGameId();
+    numGames.value = id.toNumber();
+  } catch (e: any) {
+    console.error(e);
+    numGames.value = undefined;
+  }
+}
+watch(wordleish, (w) => updateNumGames(w.read));
+updateNumGames(wordleish.value.read);
 
 let gameId = ref<string>();
 let showingNoGame = ref(false);

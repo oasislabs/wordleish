@@ -54,7 +54,12 @@ async function connectWallet() {
       <div class="empty-icon"></div>
       <span class="ml-1 text-sm">
         <span v-if="showingConnecting">Connecting…</span>
-        <span v-else>Connect Wallet</span>
+        <div v-else>
+          <span class="block" style="margin-bottom: -4px">Connect Wallet</span>
+          <span class="text-xs" :class="{ 'unk-net': unkNet }">{{
+            netName
+          }}</span>
+        </div>
       </span>
     </div>
   </button>

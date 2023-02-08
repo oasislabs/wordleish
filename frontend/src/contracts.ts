@@ -12,11 +12,11 @@ export function useWordleish(): ComputedRef<{
   write?: Wordleish;
 }> {
   const eth = useEthereumStore();
-  let addr = '0xdE5DAB93f9008D4A2A746EB4e3903bF835D8c7D4';
-  if (eth.network === Network.SapphireTestnet) {
-    addr = '0x40b81e081b1aF09875a07376bdAD27507774e9a3';
-  }
   return computed(() => {
+    let addr = '0xdE5DAB93f9008D4A2A746EB4e3903bF835D8c7D4';
+    if (eth.network === Network.SapphireTestnet) {
+      addr = '0x40b81e081b1aF09875a07376bdAD27507774e9a3';
+    }
     const read = Wordleish__factory.connect(addr, eth.provider);
     const write = eth.signer
       ? Wordleish__factory.connect(addr, eth.signer)
